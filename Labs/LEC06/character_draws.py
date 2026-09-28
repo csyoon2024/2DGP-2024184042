@@ -55,6 +55,6 @@ def move_triangle():
     move_line(750, 50, 50, 50)
 
 while True:
-    move_circle()
-    #move_rectangle()
+    #move_circle()
+    move_rectangle()
     #move_triangle()
