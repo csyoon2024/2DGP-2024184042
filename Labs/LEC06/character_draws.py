@@ -17,11 +17,19 @@ def move_circle():
         delay(0.01)
 
 def move_top():
+    for x in range(50, 751, 5):
+        clear_canvas()
+        character.draw(x, 550)
+        update_canvas()
+        delay(0.01)
     pass
+
 def move_right():
     pass
+
 def move_bottom():
     pass
+
 def move_left():
     pass
 
