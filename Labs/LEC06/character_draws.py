@@ -41,7 +41,7 @@ def move_rectangle():
     move_left()
     pass
 
-def move_line(x0, y0, x1, y1):
+def move_line(x1, y1, x2, y2):
     for step in range(101):
         t = step / 100
         pass
