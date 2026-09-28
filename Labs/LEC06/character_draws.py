@@ -25,7 +25,15 @@ def draw_character(x):
     delay(0.01)
 
 def move_right():
+    for y in range(550, 49, -5):
+        draw_character_right(y)
     pass
+
+def draw_character_right(y):
+    clear_canvas()
+    character.draw(750, y)
+    update_canvas()
+    delay(0.01)
 
 def move_bottom():
     pass
