@@ -44,6 +44,7 @@ def move_rectangle():
 def move_line(x1, y1, x2, y2):
     for step in range(101):
         t = step / 100
+        x = x1 + (x2 - x1) * t
         pass
 
 def move_triangle():
