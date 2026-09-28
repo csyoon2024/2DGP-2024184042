@@ -43,6 +43,7 @@ def move_rectangle():
 
 def move_line(x0, y0, x1, y1):
     for step in range(101):
+        t = step / 100
         pass
 
 def move_triangle():
