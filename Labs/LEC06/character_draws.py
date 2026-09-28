@@ -10,7 +10,7 @@ def move_circle():
         theta = math.radians(degree)
         x = 400 + 200 * math.cos(theta)
         y = 300 + 200 * math.sin(theta)
-        character.draw(x, y)
+        draw_character(x, y)
 
 def draw_character(x, y):
     clear_canvas()
