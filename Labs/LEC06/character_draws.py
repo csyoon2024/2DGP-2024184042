@@ -10,7 +10,6 @@ def move_circle():
         theta = math.radians(degree)
         x = 400 + 200 * math.cos(theta)
         y = 300 + 200 * math.sin(theta)
-
         character.draw(x, y)
 
 def draw_character(x, y):
@@ -32,7 +31,8 @@ def move_bottom():
         draw_character(x, 50)
 
 def move_left():
-    pass
+    for y in range(50, 551, 5):
+        draw_character(50, y)
 
 def move_rectangle():
     print('rectangle')
