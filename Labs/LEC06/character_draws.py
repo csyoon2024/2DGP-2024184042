@@ -41,7 +41,7 @@ def move_rectangle():
     move_left()
     pass
 
-def move_line():
+def move_line(x0, y0, x1, y1):
     pass
 
 def move_triangle():
