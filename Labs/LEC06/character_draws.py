@@ -35,15 +35,17 @@ def move_left():
         draw_character(50, y)
 
 def move_rectangle():
-    print('rectangle')
     move_top()
     move_right()
     move_bottom()
     move_left()
     pass
 
+def move_line():
+    pass
+
 def move_triangle():
-    print('triangle')
+    move_line()
 
 while True:
     move_circle()
