@@ -42,7 +42,8 @@ def move_rectangle():
     pass
 
 def move_line(x0, y0, x1, y1):
-    pass
+    for step in range(101):
+        pass
 
 def move_triangle():
     move_line()
