@@ -50,7 +50,7 @@ def move_line(x1, y1, x2, y2):
         draw_character(x, y)
 
 def move_triangle():
-    move_line()
+    move_line(50, 50, 400, 550)
 
 while True:
     move_circle()
