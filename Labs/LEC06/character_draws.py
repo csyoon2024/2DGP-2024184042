@@ -18,9 +18,9 @@ def move_top():
         draw_character(x)
     pass
 
-def draw_character(x):
+def draw_character(x, y):
     clear_canvas()
-    character.draw(x, 550)
+    character.draw(x, y)
     update_canvas()
     delay(0.01)
 
