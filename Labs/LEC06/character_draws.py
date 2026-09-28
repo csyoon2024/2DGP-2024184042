@@ -46,7 +46,8 @@ def move_line(x1, y1, x2, y2):
         t = step / 100
         x = x1 + (x2 - x1) * t
         y = y1 + (y2 - y1) * t
-        pass
+
+        draw_character(x, y)
 
 def move_triangle():
     move_line()
