@@ -1,3 +1,4 @@
+import math
 from pathlib import Path
 
 from pico2d import SDL_QUIT, close_canvas, clear_canvas, delay, get_events, get_time, load_image, open_canvas, update_canvas
@@ -106,6 +107,10 @@ def advance_frame_time(
 ):
 	if frame_count <= 0:
 		raise ValueError("An animation must contain at least one frame")
+	if not math.isfinite(frame_timer) or not math.isfinite(elapsed_time):
+		raise ValueError("Animation timing values must be finite")
+	if repeat_limit is not None and repeat_limit <= 0:
+		raise ValueError("Repeat limit must be positive")
 	frame_timer += max(0.0, elapsed_time)
 	finished = False
 	while frame_timer + 1e-12 >= FRAME_DURATION and not finished:
@@ -154,6 +159,8 @@ class AnimationSequence:
 		return self.animation_order[self.animation_index]
 
 	def update(self, current_time):
+		if not math.isfinite(current_time):
+			raise ValueError("Animation clock must return a finite time")
 		elapsed_time = 0.0 if self.last_time is None else max(0.0, current_time - self.last_time)
 		self.last_time = current_time
 
@@ -184,24 +191,25 @@ class AnimationSequence:
 
 def run():
 	open_canvas(SCREEN_WIDTH, SCREEN_HEIGHT)
-	sprite_sheet = load_image(str(Path(__file__).with_name("AI_Sprite.png")))
-	sequence = AnimationSequence()
+	try:
+		sprite_sheet = load_image(str(Path(__file__).with_name("AI_Sprite.png")))
+		sequence = AnimationSequence()
 
-	running = True
-	while running:
-		_, frame_rect = sequence.update(get_time())
+		running = True
+		while running:
+			_, frame_rect = sequence.update(get_time())
 
-		clear_canvas()
-		draw_frame(sprite_sheet, frame_rect)
-		update_canvas()
+			clear_canvas()
+			draw_frame(sprite_sheet, frame_rect)
+			update_canvas()
 
-		for event in get_events():
-			if event.type == SDL_QUIT:
-				running = False
+			for event in get_events():
+				if event.type == SDL_QUIT:
+					running = False
 
-		delay(0.001)
-
-	close_canvas()
+			delay(0.001)
+	finally:
+		close_canvas()
 
 
 if __name__ == "__main__":

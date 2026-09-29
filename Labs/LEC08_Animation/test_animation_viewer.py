@@ -1,4 +1,7 @@
 import unittest
+from unittest.mock import patch
+
+import Labs.LEC08_Animation.animation_viewer as animation_viewer
 
 from Labs.LEC08_Animation.animation_viewer import (
     ANIMATION_FRAMES,
@@ -73,6 +76,32 @@ class AnimationViewerTests(unittest.TestCase):
             AnimationSequence(animation_frames={}, animation_order=())
         with self.assertRaises(ValueError):
             AnimationSequence(animation_frames={"A": ()}, animation_order=("A",))
+
+    def test_clock_rollback_and_nonfinite_time(self):
+        sequence = AnimationSequence()
+        with self.assertRaises(ValueError):
+            sequence.update(float("nan"))
+
+        name, frame = sequence.update(1.0)
+        self.assertEqual((name, frame), ("A", ANIMATION_FRAMES["A"][0]))
+        name, frame = sequence.update(0.5)
+        self.assertEqual((name, frame), ("A", ANIMATION_FRAMES["A"][0]))
+        name, frame = sequence.update(0.6)
+        self.assertEqual((name, frame), ("A", ANIMATION_FRAMES["A"][1]))
+
+    def test_run_closes_canvas_when_rendering_fails(self):
+        with (
+            patch.object(animation_viewer, "open_canvas"),
+            patch.object(animation_viewer, "close_canvas") as close_canvas,
+            patch.object(animation_viewer, "clear_canvas"),
+            patch.object(animation_viewer, "update_canvas"),
+            patch.object(animation_viewer, "load_image", return_value=object()),
+            patch.object(animation_viewer, "get_time", return_value=0.0),
+            patch.object(animation_viewer, "draw_frame", side_effect=RuntimeError("draw failed")),
+        ):
+            with self.assertRaisesRegex(RuntimeError, "draw failed"):
+                animation_viewer.run()
+        close_canvas.assert_called_once_with()
 
 
 if __name__ == "__main__":
