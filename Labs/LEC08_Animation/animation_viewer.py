@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from pico2d import SDL_QUIT, close_canvas, clear_canvas, delay, get_events, load_image, open_canvas, update_canvas
+from pico2d import SDL_QUIT, close_canvas, clear_canvas, delay, get_events, get_time, load_image, open_canvas, update_canvas
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -8,6 +8,7 @@ SCREEN_CENTER_X = SCREEN_WIDTH // 2
 SCREEN_CENTER_Y = SCREEN_HEIGHT // 2
 SPRITE_SHEET_WIDTH = 1792
 SPRITE_SHEET_HEIGHT = 2358
+FRAME_DURATION = 0.1
 
 ANIMATION_FRAMES = {
 	"A": (
@@ -79,14 +80,30 @@ def next_frame_index(frame_index, frame_count):
 	return (frame_index + 1) % frame_count
 
 
+def advance_frame_time(frame_index, frame_timer, elapsed_time, frame_count):
+	frame_timer += max(0.0, elapsed_time)
+	while frame_timer >= FRAME_DURATION:
+		frame_index = next_frame_index(frame_index, frame_count)
+		frame_timer -= FRAME_DURATION
+	return frame_index, frame_timer
+
+
 def run():
 	open_canvas(SCREEN_WIDTH, SCREEN_HEIGHT)
 	sprite_sheet = load_image(str(Path(__file__).with_name("AI_Sprite.png")))
 	frames = ANIMATION_FRAMES["A"]
 	frame_index = 0
+	frame_timer = 0.0
+	last_time = get_time()
 
 	running = True
 	while running:
+		current_time = get_time()
+		frame_index, frame_timer = advance_frame_time(
+			frame_index, frame_timer, current_time - last_time, len(frames)
+		)
+		last_time = current_time
+
 		clear_canvas()
 		draw_frame(sprite_sheet, frames[frame_index])
 		update_canvas()
@@ -95,8 +112,7 @@ def run():
 			if event.type == SDL_QUIT:
 				running = False
 
-		frame_index = next_frame_index(frame_index, len(frames))
-		delay(0.1)
+		delay(0.001)
 
 	close_canvas()
 
