@@ -46,6 +46,7 @@ ANIMATION_FRAMES = {
 		(1513, 1911, 221, 222),
 	),
 }
+ANIMATION_ORDER = ("A", "B", "C", "D")
 
 
 def get_frame_source_rect(frame_rect):
@@ -94,6 +95,12 @@ def next_frame_index(frame_index, frame_count):
 	return (frame_index + 1) % frame_count
 
 
+def next_animation_index(animation_index, animation_count):
+	if animation_index + 1 >= animation_count:
+		return None
+	return animation_index + 1
+
+
 def advance_frame_time(
 	frame_index, frame_timer, elapsed_time, frame_count, repeat_count=0, repeat_limit=None
 ):
@@ -126,7 +133,9 @@ def is_pause_complete(pause_started_at, current_time):
 def run():
 	open_canvas(SCREEN_WIDTH, SCREEN_HEIGHT)
 	sprite_sheet = load_image(str(Path(__file__).with_name("AI_Sprite.png")))
-	frames = ANIMATION_FRAMES["A"]
+	animation_index = 0
+	animation_name = ANIMATION_ORDER[animation_index]
+	frames = ANIMATION_FRAMES[animation_name]
 	frame_index = 0
 	frame_timer = 0.0
 	repeat_counts = {name: 0 for name in ANIMATION_FRAMES}
@@ -142,18 +151,24 @@ def run():
 		first_frame = False
 		if playback_finished:
 			if is_pause_complete(pause_started_at, current_time):
-				frame_index = 0
-				frame_timer = 0.0
-				repeat_counts["A"] = 0
-				playback_finished = False
-				pause_started_at = None
+				next_index = next_animation_index(animation_index, len(ANIMATION_ORDER))
+				if next_index is None:
+					running = False
+				else:
+					animation_index = next_index
+					animation_name = ANIMATION_ORDER[animation_index]
+					frames = ANIMATION_FRAMES[animation_name]
+					frame_index = 0
+					frame_timer = 0.0
+					playback_finished = False
+					pause_started_at = None
 		else:
-			frame_index, frame_timer, repeat_counts["A"], playback_finished = advance_frame_time(
+			frame_index, frame_timer, repeat_counts[animation_name], playback_finished = advance_frame_time(
 				frame_index,
 				frame_timer,
 				elapsed_time,
 				len(frames),
-				repeat_counts["A"],
+				repeat_counts[animation_name],
 				REPEAT_LIMIT,
 			)
 			if playback_finished:
