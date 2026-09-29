@@ -6,6 +6,7 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_CENTER_X = SCREEN_WIDTH // 2
 SCREEN_CENTER_Y = SCREEN_HEIGHT // 2
+MIN_DISPLAY_HEIGHT = SCREEN_HEIGHT // 2
 SPRITE_SHEET_WIDTH = 1792
 SPRITE_SHEET_HEIGHT = 2358
 FRAME_DURATION = 0.1
@@ -67,7 +68,7 @@ def get_frame_destination_rect(frame_rect):
 
 def get_frame_destination_size(frame_rect):
 	_, _, source_width, source_height = get_frame_source_rect(frame_rect)
-	draw_height = 260
+	draw_height = MIN_DISPLAY_HEIGHT
 	draw_width = round(draw_height * source_width / source_height)
 	return draw_width, draw_height
 
