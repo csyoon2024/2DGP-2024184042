@@ -61,10 +61,15 @@ def get_frame_source_rect(frame_rect):
 
 
 def get_frame_destination_rect(frame_rect):
+	draw_width, draw_height = get_frame_destination_size(frame_rect)
+	return SCREEN_CENTER_X, SCREEN_CENTER_Y, draw_width, draw_height
+
+
+def get_frame_destination_size(frame_rect):
 	_, _, source_width, source_height = get_frame_source_rect(frame_rect)
 	draw_height = 260
 	draw_width = round(draw_height * source_width / source_height)
-	return SCREEN_CENTER_X, SCREEN_CENTER_Y, draw_width, draw_height
+	return draw_width, draw_height
 
 
 def draw_frame(image, frame_rect):
