@@ -11,6 +11,7 @@ SPRITE_SHEET_WIDTH = 1792
 SPRITE_SHEET_HEIGHT = 2358
 FRAME_DURATION = 0.1
 REPEAT_LIMIT = 5
+PAUSE_DURATION = 1.0
 
 ANIMATION_FRAMES = {
 	"A": (
@@ -118,6 +119,10 @@ def advance_frame_time(
 	return frame_index, frame_timer, repeat_count, finished
 
 
+def is_pause_complete(pause_started_at, current_time):
+	return current_time - pause_started_at >= PAUSE_DURATION
+
+
 def run():
 	open_canvas(SCREEN_WIDTH, SCREEN_HEIGHT)
 	sprite_sheet = load_image(str(Path(__file__).with_name("AI_Sprite.png")))
@@ -126,20 +131,33 @@ def run():
 	frame_timer = 0.0
 	repeat_counts = {name: 0 for name in ANIMATION_FRAMES}
 	playback_finished = False
+	pause_started_at = None
 	last_time = get_time()
+	first_frame = True
 
 	running = True
 	while running:
 		current_time = get_time()
-		if not playback_finished:
+		elapsed_time = 0.0 if first_frame else current_time - last_time
+		first_frame = False
+		if playback_finished:
+			if is_pause_complete(pause_started_at, current_time):
+				frame_index = 0
+				frame_timer = 0.0
+				repeat_counts["A"] = 0
+				playback_finished = False
+				pause_started_at = None
+		else:
 			frame_index, frame_timer, repeat_counts["A"], playback_finished = advance_frame_time(
 				frame_index,
 				frame_timer,
-				current_time - last_time,
+				elapsed_time,
 				len(frames),
 				repeat_counts["A"],
 				REPEAT_LIMIT,
 			)
+			if playback_finished:
+				pause_started_at = current_time
 		last_time = current_time
 
 		clear_canvas()
