@@ -60,17 +60,23 @@ def get_frame_source_rect(frame_rect):
 	return source_x, source_y, source_width, source_height
 
 
-def draw_frame(image, frame_rect):
-	source_x, source_y, source_width, source_height = get_frame_source_rect(frame_rect)
+def get_frame_destination_rect(frame_rect):
+	_, _, source_width, source_height = get_frame_source_rect(frame_rect)
 	draw_height = 260
 	draw_width = round(draw_height * source_width / source_height)
+	return SCREEN_CENTER_X, SCREEN_CENTER_Y, draw_width, draw_height
+
+
+def draw_frame(image, frame_rect):
+	source_x, source_y, source_width, source_height = get_frame_source_rect(frame_rect)
+	destination_x, destination_y, draw_width, draw_height = get_frame_destination_rect(frame_rect)
 	image.clip_draw(
 		source_x,
 		source_y,
 		source_width,
 		source_height,
-		SCREEN_CENTER_X,
-		SCREEN_CENTER_Y,
+		destination_x,
+		destination_y,
 		draw_width,
 		draw_height,
 	)
