@@ -94,10 +94,14 @@ def next_frame_index(frame_index, frame_count):
 
 def advance_frame_time(frame_index, frame_timer, elapsed_time, frame_count):
 	frame_timer += max(0.0, elapsed_time)
-	while frame_timer >= FRAME_DURATION:
+	completed_repeats = 0
+	while frame_timer + 1e-12 >= FRAME_DURATION:
 		frame_index = next_frame_index(frame_index, frame_count)
+		if frame_index == 0:
+			completed_repeats += 1
 		frame_timer -= FRAME_DURATION
-	return frame_index, frame_timer
+	frame_timer = max(0.0, frame_timer)
+	return frame_index, frame_timer, completed_repeats
 
 
 def run():
@@ -106,14 +110,16 @@ def run():
 	frames = ANIMATION_FRAMES["A"]
 	frame_index = 0
 	frame_timer = 0.0
+	repeat_counts = {name: 0 for name in ANIMATION_FRAMES}
 	last_time = get_time()
 
 	running = True
 	while running:
 		current_time = get_time()
-		frame_index, frame_timer = advance_frame_time(
+		frame_index, frame_timer, completed_repeats = advance_frame_time(
 			frame_index, frame_timer, current_time - last_time, len(frames)
 		)
+		repeat_counts["A"] += completed_repeats
 		last_time = current_time
 
 		clear_canvas()
