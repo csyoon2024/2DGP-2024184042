@@ -44,9 +44,23 @@ ANIMATION_FRAMES = {
 }
 
 
-def draw_frame(image, frame_rect):
+def get_frame_source_rect(frame_rect):
 	source_x, source_top, source_width, source_height = frame_rect
 	source_y = SPRITE_SHEET_HEIGHT - source_top - source_height
+	if (
+		source_x < 0
+		or source_top < 0
+		or source_width <= 0
+		or source_height <= 0
+		or source_x + source_width > SPRITE_SHEET_WIDTH
+		or source_top + source_height > SPRITE_SHEET_HEIGHT
+	):
+		raise ValueError(f"Frame rectangle is outside the sprite sheet: {frame_rect}")
+	return source_x, source_y, source_width, source_height
+
+
+def draw_frame(image, frame_rect):
+	source_x, source_y, source_width, source_height = get_frame_source_rect(frame_rect)
 	draw_height = 260
 	draw_width = round(draw_height * source_width / source_height)
 	image.clip_draw(
