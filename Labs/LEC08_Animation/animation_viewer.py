@@ -1,4 +1,6 @@
-from pico2d import SDL_QUIT, close_canvas, clear_canvas, get_events, open_canvas, update_canvas
+from pathlib import Path
+
+from pico2d import SDL_QUIT, close_canvas, clear_canvas, get_events, load_image, open_canvas, update_canvas
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -42,12 +44,32 @@ ANIMATION_FRAMES = {
 }
 
 
+def draw_frame(image, frame_rect):
+	source_x, source_top, source_width, source_height = frame_rect
+	source_y = SPRITE_SHEET_HEIGHT - source_top - source_height
+	draw_height = 260
+	draw_width = round(draw_height * source_width / source_height)
+	image.clip_draw(
+		source_x,
+		source_y,
+		source_width,
+		source_height,
+		SCREEN_CENTER_X,
+		SCREEN_CENTER_Y,
+		draw_width,
+		draw_height,
+	)
+
+
 def run():
 	open_canvas(SCREEN_WIDTH, SCREEN_HEIGHT)
+	sprite_sheet = load_image(str(Path(__file__).with_name("AI_Sprite.png")))
+	frame_rect = ANIMATION_FRAMES["A"][0]
 
 	running = True
 	while running:
 		clear_canvas()
+		draw_frame(sprite_sheet, frame_rect)
 		update_canvas()
 
 		for event in get_events():
