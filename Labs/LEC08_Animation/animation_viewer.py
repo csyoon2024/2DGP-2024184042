@@ -96,9 +96,9 @@ def next_frame_index(frame_index, frame_count):
 
 
 def next_animation_index(animation_index, animation_count):
-	if animation_index + 1 >= animation_count:
-		return None
-	return animation_index + 1
+	if animation_count <= 0:
+		raise ValueError("An animation sequence must not be empty")
+	return (animation_index + 1) % animation_count
 
 
 def advance_frame_time(
@@ -151,17 +151,13 @@ def run():
 		first_frame = False
 		if playback_finished:
 			if is_pause_complete(pause_started_at, current_time):
-				next_index = next_animation_index(animation_index, len(ANIMATION_ORDER))
-				if next_index is None:
-					running = False
-				else:
-					animation_index = next_index
-					animation_name = ANIMATION_ORDER[animation_index]
-					frames = ANIMATION_FRAMES[animation_name]
-					frame_index = 0
-					frame_timer = 0.0
-					playback_finished = False
-					pause_started_at = None
+				animation_index = next_animation_index(animation_index, len(ANIMATION_ORDER))
+				animation_name = ANIMATION_ORDER[animation_index]
+				frames = ANIMATION_FRAMES[animation_name]
+				frame_index = 0
+				frame_timer = 0.0
+				playback_finished = False
+				pause_started_at = None
 		else:
 			frame_index, frame_timer, repeat_counts[animation_name], playback_finished = advance_frame_time(
 				frame_index,
