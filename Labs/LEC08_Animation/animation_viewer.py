@@ -130,49 +130,69 @@ def is_pause_complete(pause_started_at, current_time):
 	return current_time - pause_started_at >= PAUSE_DURATION
 
 
+class AnimationSequence:
+	def __init__(self, animation_frames=ANIMATION_FRAMES, animation_order=ANIMATION_ORDER):
+		self.animation_frames = animation_frames
+		self.animation_order = tuple(animation_order)
+		if not self.animation_order or len(set(self.animation_order)) != len(self.animation_order):
+			raise ValueError("Animation order must contain unique animation names")
+		for name in self.animation_order:
+			if name not in self.animation_frames or not self.animation_frames[name]:
+				raise ValueError(f"Animation {name!r} has no frames")
+			for frame_rect in self.animation_frames[name]:
+				get_frame_source_rect(frame_rect)
+
+		self.animation_index = 0
+		self.frame_index = 0
+		self.frame_timer = 0.0
+		self.repeat_count = 0
+		self.pause_started_at = None
+		self.last_time = None
+
+	@property
+	def animation_name(self):
+		return self.animation_order[self.animation_index]
+
+	def update(self, current_time):
+		elapsed_time = 0.0 if self.last_time is None else max(0.0, current_time - self.last_time)
+		self.last_time = current_time
+
+		if self.pause_started_at is not None:
+			if is_pause_complete(self.pause_started_at, current_time):
+				self.animation_index = next_animation_index(
+					self.animation_index, len(self.animation_order)
+				)
+				self.frame_index = 0
+				self.frame_timer = 0.0
+				self.repeat_count = 0
+				self.pause_started_at = None
+		else:
+			frames = self.animation_frames[self.animation_name]
+			self.frame_index, self.frame_timer, self.repeat_count, finished = advance_frame_time(
+				self.frame_index,
+				self.frame_timer,
+				elapsed_time,
+				len(frames),
+				self.repeat_count,
+				REPEAT_LIMIT,
+			)
+			if finished:
+				self.pause_started_at = current_time
+
+		return self.animation_name, self.animation_frames[self.animation_name][self.frame_index]
+
+
 def run():
 	open_canvas(SCREEN_WIDTH, SCREEN_HEIGHT)
 	sprite_sheet = load_image(str(Path(__file__).with_name("AI_Sprite.png")))
-	animation_index = 0
-	animation_name = ANIMATION_ORDER[animation_index]
-	frames = ANIMATION_FRAMES[animation_name]
-	frame_index = 0
-	frame_timer = 0.0
-	repeat_counts = {name: 0 for name in ANIMATION_FRAMES}
-	playback_finished = False
-	pause_started_at = None
-	last_time = get_time()
-	first_frame = True
+	sequence = AnimationSequence()
 
 	running = True
 	while running:
-		current_time = get_time()
-		elapsed_time = 0.0 if first_frame else current_time - last_time
-		first_frame = False
-		if playback_finished:
-			if is_pause_complete(pause_started_at, current_time):
-				animation_index = next_animation_index(animation_index, len(ANIMATION_ORDER))
-				animation_name = ANIMATION_ORDER[animation_index]
-				frames = ANIMATION_FRAMES[animation_name]
-				frame_index = 0
-				frame_timer = 0.0
-				playback_finished = False
-				pause_started_at = None
-		else:
-			frame_index, frame_timer, repeat_counts[animation_name], playback_finished = advance_frame_time(
-				frame_index,
-				frame_timer,
-				elapsed_time,
-				len(frames),
-				repeat_counts[animation_name],
-				REPEAT_LIMIT,
-			)
-			if playback_finished:
-				pause_started_at = current_time
-		last_time = current_time
+		_, frame_rect = sequence.update(get_time())
 
 		clear_canvas()
-		draw_frame(sprite_sheet, frames[frame_index])
+		draw_frame(sprite_sheet, frame_rect)
 		update_canvas()
 
 		for event in get_events():
