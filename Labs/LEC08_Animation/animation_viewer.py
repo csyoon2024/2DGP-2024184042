@@ -10,6 +10,7 @@ MIN_DISPLAY_HEIGHT = SCREEN_HEIGHT // 2
 SPRITE_SHEET_WIDTH = 1792
 SPRITE_SHEET_HEIGHT = 2358
 FRAME_DURATION = 0.1
+REPEAT_LIMIT = 5
 
 ANIMATION_FRAMES = {
 	"A": (
@@ -92,16 +93,29 @@ def next_frame_index(frame_index, frame_count):
 	return (frame_index + 1) % frame_count
 
 
-def advance_frame_time(frame_index, frame_timer, elapsed_time, frame_count):
+def advance_frame_time(
+	frame_index, frame_timer, elapsed_time, frame_count, repeat_count=0, repeat_limit=None
+):
+	if frame_count <= 0:
+		raise ValueError("An animation must contain at least one frame")
 	frame_timer += max(0.0, elapsed_time)
-	completed_repeats = 0
-	while frame_timer + 1e-12 >= FRAME_DURATION:
+	finished = False
+	while frame_timer + 1e-12 >= FRAME_DURATION and not finished:
+		if (
+			repeat_limit is not None
+			and frame_index == frame_count - 1
+			and repeat_count + 1 >= repeat_limit
+		):
+			repeat_count += 1
+			frame_timer = 0.0
+			finished = True
+			break
 		frame_index = next_frame_index(frame_index, frame_count)
 		if frame_index == 0:
-			completed_repeats += 1
+			repeat_count += 1
 		frame_timer -= FRAME_DURATION
 	frame_timer = max(0.0, frame_timer)
-	return frame_index, frame_timer, completed_repeats
+	return frame_index, frame_timer, repeat_count, finished
 
 
 def run():
@@ -111,15 +125,21 @@ def run():
 	frame_index = 0
 	frame_timer = 0.0
 	repeat_counts = {name: 0 for name in ANIMATION_FRAMES}
+	playback_finished = False
 	last_time = get_time()
 
 	running = True
 	while running:
 		current_time = get_time()
-		frame_index, frame_timer, completed_repeats = advance_frame_time(
-			frame_index, frame_timer, current_time - last_time, len(frames)
-		)
-		repeat_counts["A"] += completed_repeats
+		if not playback_finished:
+			frame_index, frame_timer, repeat_counts["A"], playback_finished = advance_frame_time(
+				frame_index,
+				frame_timer,
+				current_time - last_time,
+				len(frames),
+				repeat_counts["A"],
+				REPEAT_LIMIT,
+			)
 		last_time = current_time
 
 		clear_canvas()
