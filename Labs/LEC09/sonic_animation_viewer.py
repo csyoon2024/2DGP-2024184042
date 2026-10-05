@@ -74,3 +74,19 @@ ANIMATIONS = (
 	)),
 )
 
+
+def get_source_rect(frame_rect):
+	left, top, width, height = frame_rect
+	if (
+		left < 0
+		or top < 0
+		or width <= 0
+		or height <= 0
+		or left + width > SHEET_W
+		or top + height > SHEET_H
+	):
+		raise ValueError(f"Frame is outside the sprite sheet: {frame_rect}")
+	return left, SHEET_H - top - height, width, height
+
+
+
