@@ -154,4 +154,32 @@ class AnimationSequence:
 		return self.animation_name, self.animations[self.animation_index][2][self.frame_index]
 
 
+def run():
+	open_canvas(CANVAS_W, CANVAS_H)
+	try:
+		sprite_sheet = load_image(str(Path(__file__).with_name("sonic-sprite.png")))
+		font = load_font("C:/Windows/Fonts/arial.ttf", 24)
+		sequence = AnimationSequence()
+		running = True
+
+		while running:
+			for event in get_events():
+				if event.type == SDL_QUIT or (
+					event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE
+				):
+					running = False
+					break
+			if not running:
+				break
+
+			name, frame_rect = sequence.update(get_time())
+			clear_canvas()
+			draw_frame(sprite_sheet, frame_rect)
+			font.draw(24, CANVAS_H - 40, name, (255, 255, 255))
+			update_canvas()
+			delay(0.001)
+	finally:
+		close_canvas()
+
+
 
