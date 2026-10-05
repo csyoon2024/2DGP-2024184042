@@ -89,4 +89,18 @@ def get_source_rect(frame_rect):
 	return left, SHEET_H - top - height, width, height
 
 
+def draw_frame(image, frame_rect):
+	source_x, source_y, frame_w, frame_h = get_source_rect(frame_rect)
+	image.clip_draw(
+		source_x,
+		source_y,
+		frame_w,
+		frame_h,
+		CANVAS_W // 2,
+		CANVAS_H // 2,
+		frame_w * SCALE,
+		frame_h * SCALE,
+	)
+
+
 
