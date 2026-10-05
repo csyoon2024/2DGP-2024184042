@@ -103,4 +103,21 @@ def draw_frame(image, frame_rect):
 	)
 
 
+class AnimationSequence:
+	def __init__(self, animations=ANIMATIONS):
+		if not animations:
+			raise ValueError("At least one animation is required")
+		for name, frame_delay, frames in animations:
+			if not name or frame_delay <= 0 or not frames:
+				raise ValueError(f"Invalid animation: {name!r}")
+			for frame_rect in frames:
+				get_source_rect(frame_rect)
+		self.animations = animations
+		self.animation_index = 0
+		self.frame_index = 0
+		self.frame_timer = 0.0
+		self.repeat_count = 0
+		self.pause_started_at = None
+		self.last_time = None
+
 
