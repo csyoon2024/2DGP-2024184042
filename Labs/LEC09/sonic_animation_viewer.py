@@ -17,6 +17,7 @@ from pico2d import (
 )
 
 CANVAS_W, CANVAS_H = 800, 600
+CENTER_X, CENTER_Y = CANVAS_W // 2, CANVAS_H // 2
 SCALE = 3
 FPS_DELAY = 0.08
 REPEAT_COUNT = 5
@@ -96,8 +97,8 @@ def draw_frame(image, frame_rect):
 		source_y,
 		frame_w,
 		frame_h,
-		CANVAS_W // 2,
-		CANVAS_H // 2,
+		CENTER_X,
+		CENTER_Y,
 		frame_w * SCALE,
 		frame_h * SCALE,
 	)
