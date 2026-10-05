@@ -124,4 +124,34 @@ class AnimationSequence:
 	def animation_name(self):
 		return self.animations[self.animation_index][0]
 
+	def update(self, current_time):
+		if not math.isfinite(current_time):
+			raise ValueError("Animation clock must return a finite time")
+		elapsed = 0.0 if self.last_time is None else max(0.0, current_time - self.last_time)
+		self.last_time = current_time
+
+		if self.pause_started_at is not None:
+			if current_time - self.pause_started_at >= PAUSE_SEC:
+				self.animation_index = (self.animation_index + 1) % len(self.animations)
+				self.frame_index = 0
+				self.frame_timer = 0.0
+				self.repeat_count = 0
+				self.pause_started_at = None
+		else:
+			_, frame_delay, frames = self.animations[self.animation_index]
+			self.frame_timer += elapsed
+			while self.frame_timer + 1e-12 >= frame_delay:
+				self.frame_timer = max(0.0, self.frame_timer - frame_delay)
+				self.frame_index += 1
+				if self.frame_index == len(frames):
+					self.frame_index = 0
+					self.repeat_count += 1
+					if self.repeat_count == REPEAT_COUNT:
+						self.pause_started_at = current_time
+						self.frame_timer = 0.0
+						break
+
+		return self.animation_name, self.animations[self.animation_index][2][self.frame_index]
+
+
 
