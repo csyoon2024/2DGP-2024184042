@@ -120,4 +120,8 @@ class AnimationSequence:
 		self.pause_started_at = None
 		self.last_time = None
 
+	@property
+	def animation_name(self):
+		return self.animations[self.animation_index][0]
+
 
