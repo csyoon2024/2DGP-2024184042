@@ -66,7 +66,7 @@ while running:
         animation_row = RUN_ROW_BY_FACING[facing]
     else:
         frame = 0
-        animation_row = IDLE_ROW_BY_FACING['right']
+        animation_row = IDLE_ROW_BY_FACING[facing]
     clear_canvas()
     tuk_ground.draw(TUK_WIDTH // 2, TUK_HEIGHT // 2)
     character_sheet.clip_draw(frame * FRAME_WIDTH, animation_row * FRAME_HEIGHT,
