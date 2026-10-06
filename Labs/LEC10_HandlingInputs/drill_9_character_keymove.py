@@ -48,6 +48,9 @@ def update_position():
         x += horizontal / magnitude * MOVE_SPEED
         y += vertical / magnitude * MOVE_SPEED
 
+    x = max(FRAME_WIDTH // 2, min(x, TUK_WIDTH - FRAME_WIDTH // 2))
+    y = max(FRAME_HEIGHT // 2, min(y, TUK_HEIGHT - FRAME_HEIGHT // 2))
+
 
 running = True
 x, y = TUK_WIDTH // 2, TUK_HEIGHT // 2
