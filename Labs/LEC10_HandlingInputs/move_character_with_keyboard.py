@@ -24,13 +24,17 @@ def handle_events():
 
 
 running = True
+x, y = TUK_WIDTH // 2, TUK_HEIGHT // 2
+facing = 'right'
+frame = 0
+pressed_keys = set()
 
 while running:
     clear_canvas()
     tuk_ground.draw(TUK_WIDTH // 2, TUK_HEIGHT // 2)
     character_sheet.clip_draw(0, IDLE_ROW_BY_FACING['right'] * FRAME_HEIGHT,
                               FRAME_WIDTH, FRAME_HEIGHT,
-                              TUK_WIDTH // 2, TUK_HEIGHT // 2)
+                              x, y)
     update_canvas()
     handle_events()
     delay(0.05)
