@@ -6,6 +6,8 @@ FRAME_WIDTH, FRAME_HEIGHT = 100, 100
 FRAME_COUNT = 8
 IDLE_RIGHT_ROW, IDLE_LEFT_ROW = 3, 2
 RUN_RIGHT_ROW, RUN_LEFT_ROW = 1, 0
+IDLE_ROW_BY_FACING = {'right': IDLE_RIGHT_ROW, 'left': IDLE_LEFT_ROW}
+RUN_ROW_BY_FACING = {'right': RUN_RIGHT_ROW, 'left': RUN_LEFT_ROW}
 open_canvas(TUK_WIDTH, TUK_HEIGHT)
 tuk_ground = load_image('TUK_GROUND.png')
 character_sheet = load_image('animation_sheet.png')
@@ -26,7 +28,8 @@ running = True
 while running:
     clear_canvas()
     tuk_ground.draw(TUK_WIDTH // 2, TUK_HEIGHT // 2)
-    character_sheet.clip_draw(0, IDLE_RIGHT_ROW * FRAME_HEIGHT, FRAME_WIDTH, FRAME_HEIGHT,
+    character_sheet.clip_draw(0, IDLE_ROW_BY_FACING['right'] * FRAME_HEIGHT,
+                              FRAME_WIDTH, FRAME_HEIGHT,
                               TUK_WIDTH // 2, TUK_HEIGHT // 2)
     update_canvas()
     handle_events()
