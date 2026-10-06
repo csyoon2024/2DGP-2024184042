@@ -14,13 +14,16 @@ character_sheet = load_image('animation_sheet.png')
 
 
 def handle_events():
-    global running
+    global running, pressed_keys
 
     for event in get_events():
         if event.type == SDL_QUIT:
             running = False
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-            running = False
+        elif event.type == SDL_KEYDOWN:
+            if event.key == SDLK_ESCAPE:
+                running = False
+            elif event.key in (SDLK_UP, SDLK_DOWN, SDLK_LEFT, SDLK_RIGHT):
+                pressed_keys.add(event.key)
 
 
 running = True
