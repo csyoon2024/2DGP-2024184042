@@ -1,4 +1,5 @@
 import math
+import time
 
 from pico2d import *
 
@@ -6,7 +7,9 @@ from pico2d import *
 TUK_WIDTH, TUK_HEIGHT = 1280, 1024
 FRAME_WIDTH, FRAME_HEIGHT = 100, 100
 FRAME_COUNT = 8
-MOVE_SPEED = 10
+MOVE_SPEED = 200.0
+FRAME_DURATION = 0.05
+MAX_FRAME_DELTA = 0.1
 IDLE_RIGHT_ROW, IDLE_LEFT_ROW = 3, 2
 RUN_RIGHT_ROW, RUN_LEFT_ROW = 1, 0
 IDLE_ROW_BY_FACING = {'right': IDLE_RIGHT_ROW, 'left': IDLE_LEFT_ROW}
@@ -31,7 +34,7 @@ def handle_events():
             pressed_keys.discard(event.key)
 
 
-def update_position():
+def update_position(delta_time):
     global x, y, facing, is_moving
 
     horizontal = int(SDLK_RIGHT in pressed_keys) - int(SDLK_LEFT in pressed_keys)
@@ -45,37 +48,53 @@ def update_position():
     magnitude = math.hypot(horizontal, vertical)
     is_moving = magnitude > 0
     if magnitude:
-        x += horizontal / magnitude * MOVE_SPEED
-        y += vertical / magnitude * MOVE_SPEED
+        distance = MOVE_SPEED * delta_time
+        x += horizontal / magnitude * distance
+        y += vertical / magnitude * distance
 
     x = max(FRAME_WIDTH // 2, min(x, TUK_WIDTH - FRAME_WIDTH // 2))
     y = max(FRAME_HEIGHT // 2, min(y, TUK_HEIGHT - FRAME_HEIGHT // 2))
+
+
+def update_animation(delta_time):
+    global frame, animation_elapsed, animation_row
+
+    if is_moving:
+        animation_elapsed += delta_time
+        while animation_elapsed >= FRAME_DURATION:
+            frame = (frame + 1) % FRAME_COUNT
+            animation_elapsed -= FRAME_DURATION
+        animation_row = RUN_ROW_BY_FACING[facing]
+    else:
+        frame = 0
+        animation_elapsed = 0
+        animation_row = IDLE_ROW_BY_FACING[facing]
 
 
 running = True
 x, y = TUK_WIDTH // 2, TUK_HEIGHT // 2
 facing = 'right'
 frame = 0
+animation_elapsed = 0.0
 is_moving = False
 pressed_keys = set()
+previous_time = time.perf_counter()
 
 while running:
+    current_time = time.perf_counter()
+    delta_time = min(current_time - previous_time, MAX_FRAME_DELTA)
+    previous_time = current_time
     handle_events()
     if not running:
         break
-    update_position()
-    if is_moving:
-        frame = (frame + 1) % FRAME_COUNT
-        animation_row = RUN_ROW_BY_FACING[facing]
-    else:
-        frame = 0
-        animation_row = IDLE_ROW_BY_FACING[facing]
+    update_position(delta_time)
+    update_animation(delta_time)
     clear_canvas()
     tuk_ground.draw(TUK_WIDTH // 2, TUK_HEIGHT // 2)
     character_sheet.clip_draw(frame * FRAME_WIDTH, animation_row * FRAME_HEIGHT,
                               FRAME_WIDTH, FRAME_HEIGHT,
                               x, y)
     update_canvas()
-    delay(0.05)
+    delay(0.01)
 
 close_canvas()
