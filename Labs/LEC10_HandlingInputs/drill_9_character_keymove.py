@@ -4,6 +4,7 @@ from pico2d import *
 TUK_WIDTH, TUK_HEIGHT = 1280, 1024
 FRAME_WIDTH, FRAME_HEIGHT = 100, 100
 FRAME_COUNT = 8
+MOVE_SPEED = 5
 IDLE_RIGHT_ROW, IDLE_LEFT_ROW = 3, 2
 RUN_RIGHT_ROW, RUN_LEFT_ROW = 1, 0
 IDLE_ROW_BY_FACING = {'right': IDLE_RIGHT_ROW, 'left': IDLE_LEFT_ROW}
@@ -28,6 +29,17 @@ def handle_events():
             pressed_keys.discard(event.key)
 
 
+def update_position():
+    global x, facing
+
+    if SDLK_RIGHT in pressed_keys:
+        x += MOVE_SPEED
+        facing = 'right'
+    elif SDLK_LEFT in pressed_keys:
+        x -= MOVE_SPEED
+        facing = 'left'
+
+
 running = True
 x, y = TUK_WIDTH // 2, TUK_HEIGHT // 2
 facing = 'right'
@@ -35,13 +47,16 @@ frame = 0
 pressed_keys = set()
 
 while running:
+    handle_events()
+    if not running:
+        break
+    update_position()
     clear_canvas()
     tuk_ground.draw(TUK_WIDTH // 2, TUK_HEIGHT // 2)
     character_sheet.clip_draw(0, IDLE_ROW_BY_FACING['right'] * FRAME_HEIGHT,
                               FRAME_WIDTH, FRAME_HEIGHT,
                               x, y)
     update_canvas()
-    handle_events()
     delay(0.05)
 
 close_canvas()
