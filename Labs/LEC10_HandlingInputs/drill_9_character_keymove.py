@@ -32,7 +32,7 @@ def handle_events():
 
 
 def update_position():
-    global x, y, facing
+    global x, y, facing, is_moving
 
     horizontal = int(SDLK_RIGHT in pressed_keys) - int(SDLK_LEFT in pressed_keys)
     vertical = int(SDLK_UP in pressed_keys) - int(SDLK_DOWN in pressed_keys)
@@ -43,6 +43,7 @@ def update_position():
         facing = 'left'
 
     magnitude = math.hypot(horizontal, vertical)
+    is_moving = magnitude > 0
     if magnitude:
         x += horizontal / magnitude * MOVE_SPEED
         y += vertical / magnitude * MOVE_SPEED
@@ -52,6 +53,7 @@ running = True
 x, y = TUK_WIDTH // 2, TUK_HEIGHT // 2
 facing = 'right'
 frame = 0
+is_moving = False
 pressed_keys = set()
 
 while running:
@@ -59,9 +61,15 @@ while running:
     if not running:
         break
     update_position()
+    if is_moving:
+        frame = (frame + 1) % FRAME_COUNT
+        animation_row = RUN_ROW_BY_FACING[facing]
+    else:
+        frame = 0
+        animation_row = IDLE_ROW_BY_FACING['right']
     clear_canvas()
     tuk_ground.draw(TUK_WIDTH // 2, TUK_HEIGHT // 2)
-    character_sheet.clip_draw(0, IDLE_ROW_BY_FACING['right'] * FRAME_HEIGHT,
+    character_sheet.clip_draw(frame * FRAME_WIDTH, animation_row * FRAME_HEIGHT,
                               FRAME_WIDTH, FRAME_HEIGHT,
                               x, y)
     update_canvas()
