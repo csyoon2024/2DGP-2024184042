@@ -30,7 +30,7 @@ def handle_events():
 
 
 def update_position():
-    global x, facing
+    global x, y, facing
 
     if SDLK_RIGHT in pressed_keys:
         x += MOVE_SPEED
@@ -38,6 +38,11 @@ def update_position():
     elif SDLK_LEFT in pressed_keys:
         x -= MOVE_SPEED
         facing = 'left'
+
+    if SDLK_UP in pressed_keys:
+        y += MOVE_SPEED
+    elif SDLK_DOWN in pressed_keys:
+        y -= MOVE_SPEED
 
 
 running = True
