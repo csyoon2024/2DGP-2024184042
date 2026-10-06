@@ -1,3 +1,5 @@
+import math
+
 from pico2d import *
 
 
@@ -32,17 +34,18 @@ def handle_events():
 def update_position():
     global x, y, facing
 
-    if SDLK_RIGHT in pressed_keys:
-        x += MOVE_SPEED
+    horizontal = int(SDLK_RIGHT in pressed_keys) - int(SDLK_LEFT in pressed_keys)
+    vertical = int(SDLK_UP in pressed_keys) - int(SDLK_DOWN in pressed_keys)
+
+    if horizontal > 0:
         facing = 'right'
-    elif SDLK_LEFT in pressed_keys:
-        x -= MOVE_SPEED
+    elif horizontal < 0:
         facing = 'left'
 
-    if SDLK_UP in pressed_keys:
-        y += MOVE_SPEED
-    elif SDLK_DOWN in pressed_keys:
-        y -= MOVE_SPEED
+    magnitude = math.hypot(horizontal, vertical)
+    if magnitude:
+        x += horizontal / magnitude * MOVE_SPEED
+        y += vertical / magnitude * MOVE_SPEED
 
 
 running = True
