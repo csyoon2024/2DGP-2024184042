@@ -1,6 +1,10 @@
 from pico2d import *
 from boy import Boy
+from ball import Ball
 from grass import Grass
+from grass2 import Grass2
+
+import game_world
 
 
 # Game object class here
@@ -16,34 +20,32 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             running = False
         else:
-            boy.handle_event(event)
+            ball = boy.handle_event(event)
+            if isinstance(ball, Ball):
+                game_world.add_object(ball)
 
 
 
 def reset_world():
-    global world
     global boy
 
-    world = []
+    boy = Boy()
+    game_world.add_object(boy, 1)
 
     grass = Grass()
-    world.append(grass)
+    game_world.add_object(grass)
 
-    boy = Boy()
-    world.append(boy)
+    grass2 = Grass2()
 
 
 
 def update_world():
-    for o in world:
-        o.update()
-    pass
+    game_world.update()
 
 
 def render_world():
     clear_canvas()
-    for o in world:
-        o.draw()
+    game_world.render()
     update_canvas()
 
 
